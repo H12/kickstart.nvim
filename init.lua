@@ -634,6 +634,10 @@ require('lazy').setup({
         },
       }
 
+      local non_mason_servers = {
+        gleam = {},
+      }
+
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
       --  other tools, you can run
@@ -662,6 +666,12 @@ require('lazy').setup({
           end,
         },
       }
+
+      -- Enable non-mason LSPs
+      for server_name, server_config in pairs(non_mason_servers) do
+        server_config.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server_config.capabilities or {})
+        require('lspconfig')[server_name].setup(server_config)
+      end
     end,
   },
 
