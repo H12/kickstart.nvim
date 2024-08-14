@@ -210,6 +210,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- Set global border style
+local border_style = 'rounded'
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -462,7 +465,15 @@ require('lazy').setup({
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
-      { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
+      {
+        'williamboman/mason.nvim', -- NOTE: Must be loaded before dependants
+        opts = {
+          ui = {
+            height = 0.8,
+            border = border_style,
+          },
+        },
+      },
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
@@ -594,15 +605,22 @@ require('lazy').setup({
         end,
       })
 
+      -- Use rounded borders for floating windows
       vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
-        -- Use a rounded border with `FloatBorder` highlights
-        border = 'rounded',
+        border = border_style,
       })
 
       vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-        -- Use a rounded border with `FloatBorder` highlights
-        border = 'rounded',
+        border = border_style,
       })
+
+      vim.diagnostic.config {
+        float = { border = border_style },
+      }
+
+      require('lspconfig.ui.windows').default_options = {
+        border = border_style,
+      }
 
       -- Link NormalFloat to Normal to match bg color of cmp.config.window.bordered()
       vim.api.nvim_set_hl(0, 'NormalFloat', { link = 'Normal' })
@@ -978,6 +996,8 @@ require('lazy').setup({
   { import = 'custom.plugins' },
 }, {
   ui = {
+    backdrop = 100,
+    border = border_style,
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
     icons = vim.g.have_nerd_font and {} or {
