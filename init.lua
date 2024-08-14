@@ -604,12 +604,26 @@ require('lazy').setup({
         border = 'rounded',
       })
 
+      -- Link NormalFloat to Normal to match bg color of cmp.config.window.bordered()
+      vim.api.nvim_set_hl(0, 'NormalFloat', { link = 'Normal' })
+
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+
+      -- Enable manually-installed language servers here
+      --   Do this when you want to use an LSP that cannot be installed via mason
+      local manual_servers = {
+        gleam = {},
+      }
+
+      for server_name, server_config in pairs(manual_servers) do
+        server_config.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server_config.capabilities or {})
+        require('lspconfig')[server_name].setup(server_config)
+      end
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -643,29 +657,10 @@ require('lazy').setup({
               completion = {
                 callSnippet = 'Replace',
               },
-              -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              -- diagnostics = { disable = { 'missing-fields' } },
-            },
-          },
-        },
-      }
-
-      local non_mason_servers = {
-        gleam = {},
-        tailwindcss = {
-          init_options = {
-            userLanguages = {
-              elixir = 'html-eex',
-              eelixir = 'html-eex',
-              heex = 'html-eex',
-            },
-          },
-          settings = {
-            tailwindCSS = {
-              experimental = {
-                classRegex = {
-                  'class[:]\\s*"([^"]*)"',
-                },
+              diagnostics = {
+                globals = { 'vim' },
+                -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+                disable = { 'missing-fields' },
               },
             },
           },
@@ -700,12 +695,6 @@ require('lazy').setup({
           end,
         },
       }
-
-      -- Enable non-mason LSPs
-      for server_name, server_config in pairs(non_mason_servers) do
-        server_config.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server_config.capabilities or {})
-        require('lspconfig')[server_name].setup(server_config)
-      end
     end,
   },
 
