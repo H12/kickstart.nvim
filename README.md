@@ -1,5 +1,35 @@
 # kickstart.nvim
 
+This my personal fork of [nvim-lua/kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim).
+
+Some customizations I've made:
+- Added some tpope plugins I like
+- Allow the use of language servers not installed by Mason
+- Set up an AI assistant (Supermaven)
+- Minor visual changes (Catppuccin & rounded borders)
+
+Pull in the latest changes from the original repo with the following commands:
+
+In order to keep up to date with the original repo...
+
+Set up a remote with:
+
+```sh
+git remote add upstream https://github.com/nvim-lua/kickstart.nvim.git
+```
+
+Pull in the latest changes from the original repo with:
+
+```sh
+git pull upstream master
+```
+
+Or rebase with:
+
+```sh
+git rebase upstream/master
+```
+
 ## Introduction
 
 A starting point for Neovim that is:
